@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (user) {
       return user; // request.user
     } else {
-      throw new UnauthorizedException('접근 오류');
+      throw new UnauthorizedException('Access Error');
     }
   }
 }

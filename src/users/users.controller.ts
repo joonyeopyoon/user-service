@@ -1,4 +1,10 @@
-import { Body, UseFilters, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Req,
+  UseFilters,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Controller, Get, Post } from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/common/exceptions/http-exception.filter';
 import { SuccessInterceptor } from 'src/common/interceptors/success.interceptor';
@@ -8,6 +14,8 @@ import { UserRequestDto } from './dto/users.request.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginRequestDto } from 'src/auth/dto/login.request.dto';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { CurrentUser } from 'src/common/decorators/user.decorator';
 
 @Controller('users')
 @UseInterceptors(SuccessInterceptor)
@@ -19,9 +27,10 @@ export class UsersController {
   ) {}
 
   @ApiOperation({ summary: '현재 유저 조회' })
+  @UseGuards(JwtAuthGuard)
   @Get()
-  getCurrentUser() {
-    return 'current user';
+  getCurrentUser(@CurrentUser() user) {
+    return user.readOnlyData;
   }
 
   @ApiResponse({
@@ -45,11 +54,12 @@ export class UsersController {
     return this.authService.jwtLogIn(data);
   }
 
-  @ApiOperation({ summary: '로그아웃' })
-  @Post('logout')
-  logOut() {
-    return 'logout';
-  }
+  // FE에서 로컬 스토리지등에 저장되어 있는 JWT를 제거하여 로그아웃 처리 가능
+  // @ApiOperation({ summary: '로그아웃' })
+  // @Post('logout')
+  // logOut() {
+  //   return 'logout';
+  // }
 
   @ApiOperation({ summary: '유저 이미지 업로드' })
   @Post('upload/users')
