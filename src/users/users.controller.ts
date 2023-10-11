@@ -1,6 +1,7 @@
 import {
   Body,
   Req,
+  UploadedFiles,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -16,6 +17,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { LoginRequestDto } from 'src/auth/dto/login.request.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/common/utils/multer.options';
 
 @Controller('users')
 @UseInterceptors(SuccessInterceptor)
@@ -62,8 +65,10 @@ export class UsersController {
   // }
 
   @ApiOperation({ summary: '유저 이미지 업로드' })
-  @Post('upload/users')
-  uploadUserImg() {
+  @UseInterceptors(FilesInterceptor('image', 10, multerOptions('users')))
+  @Post('upload')
+  uploadUserImg(@UploadedFiles() files: Array<Express.Multer.File>) {
+    console.log(files);
     return 'uploadImg';
   }
 }
