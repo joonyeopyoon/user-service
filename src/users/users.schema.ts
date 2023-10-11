@@ -46,11 +46,19 @@ export class User extends Document {
   @IsNotEmpty()
   password: string;
 
-  @Prop()
+  @Prop({
+    default:
+      'https://camo.githubusercontent.com/db496e048f1032192a24df1731f12705dae1008e0af4131de67fcad861dd67ec/68747470733a2f2f696d67312e6461756d63646e2e6e65742f7468756d622f523132383078302f3f73636f64653d6d746973746f72793226666e616d653d6874747073253341253246253246626c6f672e6b616b616f63646e2e6e6574253246646e253246436f52777825324662747138525454306456342532466c38536856726a4b5344536147474772684e6b75644b253246696d672e6a7067',
+  })
   @IsString()
   imgUrl: string;
 
-  readonly readOnlyData: { id: string; email: string; name: string };
+  readonly readOnlyData: {
+    id: string;
+    email: string;
+    name: string;
+    imgUrl: string;
+  };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -60,5 +68,6 @@ UserSchema.virtual('readOnlyData').get(function (this: User) {
     id: this.id,
     email: this.email,
     name: this.name,
+    imgUrl: this.imgUrl,
   };
 });

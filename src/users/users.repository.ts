@@ -11,6 +11,20 @@ export class UsersRepository {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
+  async findAll() {
+    return await this.userModel.find();
+  }
+
+  async findByIdAndUpdateImg(id: string, fileName: string) {
+    const user = await this.userModel.findById(id);
+
+    user.imgUrl = `http://localhost:8000/media/${fileName}`;
+
+    const newUser = await user.save();
+
+    return newUser.readOnlyData;
+  }
+
   async findUserByIdWithoutPassword(
     userId: string,
   ): Promise<UserCurrentDto | null> {

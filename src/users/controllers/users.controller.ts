@@ -9,9 +9,9 @@ import {
 import { Controller, Get, Post } from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/common/exceptions/http-exception.filter';
 import { SuccessInterceptor } from 'src/common/interceptors/success.interceptor';
-import { UsersService } from './users.service';
-import { ReadOnlyUserDto } from './dto/user.dto';
-import { UserRequestDto } from './dto/users.request.dto';
+import { UsersService } from '../services/users.service';
+import { ReadOnlyUserDto } from '../dto/user.dto';
+import { UserRequestDto } from '../dto/users.request.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginRequestDto } from 'src/auth/dto/login.request.dto';
@@ -19,6 +19,7 @@ import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/common/utils/multer.options';
+import { User } from '../users.schema';
 
 @Controller('users')
 @UseInterceptors(SuccessInterceptor)
@@ -28,6 +29,12 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
   ) {}
+
+  @ApiOperation({ summary: '모든 유저 조회' })
+  @Get('all')
+  getAllUser() {
+    return this.usersService.getAllUser();
+  }
 
   @ApiOperation({ summary: '현재 유저 조회' })
   @UseGuards(JwtAuthGuard)
@@ -66,9 +73,13 @@ export class UsersController {
 
   @ApiOperation({ summary: '유저 이미지 업로드' })
   @UseInterceptors(FilesInterceptor('image', 10, multerOptions('users')))
+  @UseGuards(JwtAuthGuard)
   @Post('upload')
-  uploadUserImg(@UploadedFiles() files: Array<Express.Multer.File>) {
-    console.log(files);
-    return 'uploadImg';
+  uploadUserImg(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @CurrentUser() user: User,
+  ) {
+    //return { image: `http://localhost:8000/media/users/${files[0].filename}` };
+    return this.usersService.uploadImg(user, files);
   }
 }
