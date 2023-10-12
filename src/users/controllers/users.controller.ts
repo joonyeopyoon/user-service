@@ -12,7 +12,7 @@ import { UsersService } from '../services/users.service';
 import { ReadOnlyUserDto } from '../dto/user.dto';
 import { UserRequestDto } from '../dto/users.request.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from 'src/auth/services/auth.service';
 import { LoginRequestDto } from 'src/auth/dto/login.request.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';

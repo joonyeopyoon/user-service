@@ -4,6 +4,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 const options: SchemaOptions = {
+  collection: 'users',
   timestamps: true,
 };
 
