@@ -1,5 +1,5 @@
-import { Model } from 'mongoose';
 import { User } from './users.schema';
+import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserCurrentDto } from './dto/users.current.dto';
@@ -26,7 +26,7 @@ export class UsersRepository {
   }
 
   async findUserByIdWithoutPassword(
-    userId: string,
+    userId: string | Types.ObjectId,
   ): Promise<UserCurrentDto | null> {
     const user = await this.userModel.findById(userId).select('-password');
     return user;

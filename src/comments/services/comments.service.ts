@@ -1,18 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import { Model } from 'mongoose';
+import { Comments } from '../comments.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { UsersRepository } from 'src/users/users.repository';
 import { CommentsCreateDto } from '../dto/comments.create.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CommentsService {
+  constructor(
+    @InjectModel(Comments.name) private readonly commentsModel: Model<Comments>,
+    private readonly usersRepository: UsersRepository,
+  ) {}
+
   async getAllComments() {
-    return 'Hello getAllComments';
+    try {
+      const comments = await this.commentsModel.find();
+      return comments;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  async createComments(id: string, comments: CommentsCreateDto) {
-    console.log(`${id}, ${JSON.stringify(comments)}`);
-    return 'Hello createComments';
+  async createComments(id: string, commentData: CommentsCreateDto) {
+    try {
+      const targetUser = await this.usersRepository.findUserByIdWithoutPassword(
+        id,
+      );
+      const { contents, author } = commentData;
+      const validatedAuthor =
+        await this.usersRepository.findUserByIdWithoutPassword(author);
+      const newComment = new this.commentsModel({
+        author: validatedAuthor._id,
+        contents,
+        info: targetUser._id,
+      });
+      return await newComment.save();
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async plusLike(id: string) {
-    return 'Hello plusLike';
+    try {
+      const comment = await this.commentsModel.findById(id);
+      comment.likeCount += 1;
+      return await comment.save();
+    } catch (error) {}
   }
 }
