@@ -1,9 +1,11 @@
+import * as mongoose from 'mongoose';
 import { User } from './users.schema';
 import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserCurrentDto } from './dto/users.current.dto';
 import { UserRequestDto } from './dto/users.request.dto';
+import { CommentsSchema } from 'src/comments/comments.schema';
 
 @Injectable()
 export class UsersRepository {
@@ -12,7 +14,12 @@ export class UsersRepository {
   ) {}
 
   async findAll() {
-    return await this.userModel.find();
+    const CommentsModel = mongoose.model('comments', CommentsSchema);
+    const result = await this.userModel
+      .find()
+      .populate('comments', CommentsModel);
+
+    return result;
   }
 
   async findByIdAndUpdateImg(id: string, fileName: string) {

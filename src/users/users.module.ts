@@ -1,11 +1,12 @@
-import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UsersController } from './controllers/users.controller';
-import { UsersService } from './services/users.service';
 import { User, UserSchema } from './users.schema';
-import { UsersRepository } from './users.repository';
 import { AuthModule } from 'src/auth/auth.module';
+import { forwardRef, Module } from '@nestjs/common';
+import { UsersRepository } from './users.repository';
 import { MulterModule } from '@nestjs/platform-express';
+import { UsersService } from './services/users.service';
+import { UsersController } from './controllers/users.controller';
+import { Comments, CommentsSchema } from 'src/comments/comments.schema';
 
 @Module({
   imports: [
@@ -13,7 +14,10 @@ import { MulterModule } from '@nestjs/platform-express';
       dest: './upload',
     }),
 
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: Comments.name, schema: CommentsSchema },
+      { name: User.name, schema: UserSchema },
+    ]),
 
     forwardRef(() => AuthModule),
   ],
