@@ -1,6 +1,6 @@
 import {
   Body,
-  UploadedFiles,
+  UploadedFile,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -16,8 +16,9 @@ import { AuthService } from 'src/auth/services/auth.service';
 import { LoginRequestDto } from 'src/auth/dto/login.request.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { multerOptions } from 'src/common/utils/multer.options';
+import { AmazonS3FileInterceptor } from 'nestjs-multer-extended';
+// import { FilesInterceptor } from '@nestjs/platform-express';
+// import { multerOptions } from 'src/common/utils/multer.options';
 import { User } from '../users.schema';
 
 @Controller('users')
@@ -71,14 +72,16 @@ export class UsersController {
   // }
 
   @ApiOperation({ summary: '유저 이미지 업로드' })
-  @UseInterceptors(FilesInterceptor('image', 10, multerOptions('users')))
+  @UseInterceptors(
+    AmazonS3FileInterceptor('file', {
+      dynamicPath: 'users',
+    }),
+  )
+  // @UseInterceptors(FilesInterceptor('image', 10, multerOptions('users'))) // Local save
   @UseGuards(JwtAuthGuard)
   @Post('upload')
-  uploadUserImg(
-    @UploadedFiles() files: Array<Express.Multer.File>,
-    @CurrentUser() user: User,
-  ) {
+  uploadUserImg(@UploadedFile() file: any, @CurrentUser() user: User) {
     //return { image: `http://localhost:8000/media/users/${files[0].filename}` };
-    return this.usersService.uploadImg(user, files);
+    return this.usersService.uploadImg(user, file);
   }
 }

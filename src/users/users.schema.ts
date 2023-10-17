@@ -73,7 +73,7 @@ _UserSchema.virtual('readOnlyData').get(function (this: User) {
     id: this.id,
     email: this.email,
     name: this.name,
-    imgUrl: this.imgUrl,
+    imgUrl: `https://nestuser.s3.ap-northeast-2.amazonaws.com/${this.imgUrl}`,
     comments: this.comments,
   };
 });
